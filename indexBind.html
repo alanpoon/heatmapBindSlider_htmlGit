@@ -1,0 +1,388 @@
+<html>
+<link rel="stylesheet" href="themes\base\jquery-ui.css">
+<style>
+ 
+#hidden{
+height:0px;
+}
+#slider{
+left: 30px;
+}
+#sliderTicks{
+left: 30px;
+}
+#sliderTicks .prefix{
+left:5px;
+}
+.margin-text{
+dominant-baseline:central;
+}
+.cal-heatmap-container{display:block}.graph{font-family:"Lucida Grande",Lucida,Verdana,sans-serif}.graph-label{fill:#000000;font-size:10px}.graph,.graph-legend rect{shape-rendering:crispedges}.graph-rect{fill:#ededed}.graph-subdomain-group rect:hover{stroke:#000;stroke-width:1px}.subdomain-text{font-size:9px;fill:#000000;pointer-events:none;text-align:middle;}.hover_cursor:hover{cursor:pointer}.qi{background-color:#999;fill:#999}.q1{background-color:#dae289;fill:#dae289}.q2{background-color:#cedb9c;fill:#9cc069}.q3{background-color:#b5cf6b;fill:#669d45}.q4{background-color:#637939;fill:#637939}.q5{background-color:#3b6427;fill:#3b6427}rect.highlight{stroke:#444;stroke-width:1}text.highlight{fill:#444}rect.now{stroke:red}text.now{fill:red;font-weight:800}.domain-background{fill:none;shape-rendering:crispedges}.ch-tooltip{padding:10px;background:#222;color:#bbb;font-size:12px;line-height:1.4;width:140px;position:absolute;z-index:99999;text-align:center;border-radius:2px;box-shadow:2px 2px 2px rgba(0,0,0,0.2);display:none;box-sizing:border-box}.ch-tooltip::after{position:absolute;width:0;height:0;border-color:transparent;border-style:solid;content:"";padding:0;display:block;bottom:-6px;left:50%;margin-left:-6px;border-width:6px 6px 0;border-top-color:#222}
+</style>
+<svg id="hidden" style="visibility: hidden"></svg>
+<table id='table1' border="3" bordercolor="#c86260" bgcolor="#CCCCFF" width="100" cellspacing="5" cellpadding="3" ></table>
+
+<div id="slider" ></div>
+<div id="sliderTicks"></div>
+
+
+<button id='update'>Update</button>
+<button id='update1'>Update</button>
+<script src="d3.v3.min.js" ></script>
+ <script src="cal-heatmap_edit1Bind.js" charset="UTF-8"></script>
+<script src="underscore.js" ></script>
+<script src="jquery-1.7.1.js" ></script>
+
+<script src="ui/jquery-ui.js"></script>
+<script type="text/javascript"> 
+//Using data to create table cell
+//data
+
+var rawdata = [{
+    periodType: "year",
+    dateTime: "2012-10-05",
+    model: "Vehicle1",
+    value: 40
+}, {
+    periodType: "month",
+    dateTime: "2012-06-06",
+    model: "Vehicle1",
+    value: 24
+}, {
+    periodType: "month",
+    dateTime: "2012-06-08",
+    model: "Vehicle1",
+    value: 16
+}, {
+    periodType: "month",
+    dateTime: "2012-06-07",
+    model: "Vehicle1",
+    value: 23
+}, {
+    periodType: "month",
+    dateTime: "2012-06-11",
+    model: "Vehicle1",
+    value: 5
+}, {
+    periodType: "month",
+    dateTime: "2012-06-12",
+    model: "Vehicle2",
+    value: 40
+}, {
+    periodType: "month",
+    dateTime: "2012-06-13",
+    model: "Vehicle2",
+    value: 38
+}, {
+    periodType: "month",
+    dateTime: "2012-06-15",
+    model: "Vehicle2",
+    value: 17
+}, {
+    periodType: "month",
+    dateTime: "2012-06-17",
+    model: "Vehicle2",
+    value: 62
+}, {
+    periodType: "month",
+    dateTime: "2012-06-18",
+    model: "Vehicle2",
+    value: 21
+}, {
+    periodType: "year",
+    dateTime: "2012-06-20",
+    model: "Vehicle2",
+    value: 20
+}];
+var processedData = [];
+_.each(rawdata, function (d) {
+    "use strict";
+    processedData.push({
+        "dateTime": (new Date(d.dateTime)).getTime() / 1000,
+        "model": d.model,
+        "value": d.value,
+        "periodType": d.periodType
+    });
+});
+/*
+ processedData=[{"dateTime":1398988800,"model":"XB6534S","value":109.38},{"dateTime":1400457600,"model":"XB6534S","value":603},{"dateTime":1400544000,"model":"XB6534S","value":4753.8},{"dateTime":1400630400,"model":"XB6534S","value":1075.2},{"dateTime":1400630400,"model":"XB6534S","value":2467.2},{"dateTime":1400630400,"model":"XB6534S","value":904.08},{"dateTime":1400630400,"model":"XB6534S","value":204.96},{"dateTime":1400630400,"model":"XB6534S","value":2625.12},{"dateTime":1400716800,"model":"XB6534S","value":90},{"dateTime":1400716800,"model":"XB6534S","value":5922},{"dateTime":1400716800,"model":"XB6534S","value":1749.75},{"dateTime":1400716800,"model":"XB6534S","value":560.4},{"dateTime":1400716800,"model":"XB6534S","value":1578.48},{"dateTime":1400716800,"model":"XB6534S","value":787.48},{"dateTime":1400716800,"model":"XB6534S","value":1332.12},{"dateTime":1400716800,"model":"XB6534S","value":186.6},{"dateTime":1400803200,"model":"XB6534S","value":5833.6},{"dateTime":1400803200,"model":"XB6534S","value":12583.62},{"dateTime":1400803200,"model":"XB6534S","value":73.8},{"dateTime":1400803200,"model":"XB6534S","value":990},{"dateTime":1400803200,"model":"XB6534S","value":3705},{"dateTime":1400803200,"model":"XB6534S","value":159.48},{"dateTime":1401062400,"model":"XB6534S","value":990},{"dateTime":1401062400,"model":"XB6534S","value":4194},{"dateTime":1401062400,"model":"XB6534S","value":2228.1},{"dateTime":1401148800,"model":"XB6534S","value":2376},{"dateTime":1401148800,"model":"XB6534S","value":2614.2},{"dateTime":1401148800,"model":"XB6534S","value":1787.04},{"dateTime":1401148800,"model":"XB6534S","value":1123.8},{"dateTime":1401148800,"model":"XB6534S","value":2587.2},{"dateTime":1401148800,"model":"XB6534S","value":314.4},{"dateTime":1401148800,"model":"XB6534S","value":210},{"dateTime":1401148800,"model":"XB6534S","value":248.4},{"dateTime":1401235200,"model":"XB6534S","value":6431.28},{"dateTime":1401235200,"model":"XB6534S","value":440},{"dateTime":1401235200,"model":"XB6534S","value":619.91},{"dateTime":1401235200,"model":"XB6534S","value":1078.8},{"dateTime":1401235200,"model":"XB6534S","value":637.5},{"dateTime":1401235200,"model":"XB6534S","value":1032},{"dateTime":1401321600,"model":"XB6534S","value":1747.2},{"dateTime":1401321600,"model":"XB6534S","value":235},{"dateTime":1401321600,"model":"XB6534S","value":1100},{"dateTime":1401321600,"model":"XB6534S","value":2233.98},{"dateTime":1401321600,"model":"XB6534S","value":2333.44},{"dateTime":1401321600,"model":"XB6534S","value":2187.6},{"dateTime":1401408000,"model":"XB6534S","value":1209.6},{"dateTime":1401408000,"model":"XB6534S","value":1131},{"dateTime":1401408000,"model":"XB6534S","value":411},{"dateTime":1401408000,"model":"XB6534S","value":177.3},{"dateTime":1401667200,"model":"XB6534S","value":1506.6},{"dateTime":1401667200,"model":"XB6534S","value":102},{"dateTime":1401667200,"model":"XB6534S","value":4468.8},{"dateTime":1401667200,"model":"XB6534S","value":1093.8},{"dateTime":1401667200,"model":"XB6534S","value":423.6},{"dateTime":1401667200,"model":"XB6534S","value":839.88},{"dateTime":1401667200,"model":"XB6534S","value":650.4},{"dateTime":1401667200,"model":"XB6534S","value":656.28},{"dateTime":1401753600,"model":"XB6534S","value":262.07},{"dateTime":1401753600,"model":"XB6534S","value":325.8},{"dateTime":1401753600,"model":"XB6534S","value":420},{"dateTime":1401753600,"model":"XB6534S","value":1101.6},{"dateTime":1401753600,"model":"XB6534S","value":780.48},{"dateTime":1401753600,"model":"XB6534S","value":4701.6},{"dateTime":1401753600,"model":"XB6534S","value":762},{"dateTime":1401753600,"model":"XB6534S","value":1182.72},{"dateTime":1401840000,"model":"XB6534S","value":223.62},{"dateTime":1401840000,"model":"XB6534S","value":2896.8},{"dateTime":1401840000,"model":"XB6534S","value":2253},{"dateTime":1401840000,"model":"XB6534S","value":2510.4},{"dateTime":1401840000,"model":"XB6534S","value":640.08},{"dateTime":1401840000,"model":"XB6534S","value":255},{"dateTime":1401840000,"model":"XB6534S","value":1026.52},{"dateTime":1401840000,"model":"XB6534S","value":2484},{"dateTime":1401926400,"model":"XB6534S","value":1668.4},{"dateTime":1401926400,"model":"XB6534S","value":4917},{"dateTime":1401926400,"model":"XB6534S","value":583.36},{"dateTime":1401926400,"model":"XB6534S","value":277.2},{"dateTime":1401926400,"model":"XB6534S","value":695},{"dateTime":1401926400,"model":"XB6534S","value":2780},{"dateTime":1401926400,"model":"XB6534S","value":2780},{"dateTime":1401926400,"model":"XB6534S","value":933.2},{"dateTime":1402012800,"model":"XB6534S","value":2967},{"dateTime":1402012800,"model":"XB6534S","value":648},{"dateTime":1402012800,"model":"XB6534S","value":1256.4},{"dateTime":1402012800,"model":"XB6534S","value":3397.79},{"dateTime":1402012800,"model":"XB6534S","value":2214},{"dateTime":1402012800,"model":"XB6534S","value":612},{"dateTime":1402012800,"model":"XB6534S","value":5550},{"dateTime":1402099200,"model":"XB6534S","value":4261.2},{"dateTime":1402099200,"model":"XB6534S","value":159.18},{"dateTime":1402272000,"model":"XB6534S","value":4156.44},{"dateTime":1402272000,"model":"XB6534S","value":1502},{"dateTime":1402358400,"model":"XB6534S","value":1647},{"dateTime":1402358400,"model":"XB6534S","value":2770.08},{"dateTime":1402358400,"model":"XB6534S","value":910},{"dateTime":1402358400,"model":"XB6534S","value":2519.13},{"dateTime":1402358400,"model":"XB6534S","value":5160},{"dateTime":1402444800,"model":"XB6534S","value":1866.4},{"dateTime":1402444800,"model":"XB6534S","value":451.17},{"dateTime":1402444800,"model":"XB6534S","value":706.38},{"dateTime":1402531200,"model":"XB6534S","value":3084},{"dateTime":1402531200,"model":"XB6534S","value":3931.2},{"dateTime":1402531200,"model":"XB6534S","value":204},{"dateTime":1402531200,"model":"XB6534S","value":1980},{"dateTime":1402617600,"model":"XB6534S","value":996.22},{"dateTime":1402617600,"model":"XB6534S","value":1531.5},{"dateTime":1402617600,"model":"XB6534S","value":2336.16},{"dateTime":1402617600,"model":"XB6534S","value":2190.36},{"dateTime":1402617600,"model":"XB6534S","value":3271.4},{"dateTime":1402617600,"model":"XB6534S","value":2187.6},{"dateTime":1402617600,"model":"XB6534S","value":466.6},{"dateTime":1402617600,"model":"XB6534S","value":664.5},{"dateTime":1402617600,"model":"XB6534S","value":792},{"dateTime":1402617600,"model":"XB6534S","value":1800},{"dateTime":1402704000,"model":"XB6534S","value":344},{"dateTime":1402876800,"model":"XB6534S","value":1665.36},{"dateTime":1402876800,"model":"XB6534S","value":530.52},{"dateTime":1402876800,"model":"XB6534S","value":19.14},{"dateTime":1402876800,"model":"XB6534S","value":475.2},{"dateTime":1402876800,"model":"XB6534S","value":3780},{"dateTime":1402876800,"model":"XB6534S","value":165.48},{"dateTime":1402963200,"model":"XB6534S","value":1038},{"dateTime":1402963200,"model":"XB6534S","value":6270.24},{"dateTime":1402963200,"model":"XB6534S","value":2028.9},{"dateTime":1402963200,"model":"XB6534S","value":722.4},{"dateTime":1402963200,"model":"XB6534S","value":5640},{"dateTime":1402963200,"model":"XB6534S","value":206.7},{"dateTime":1402963200,"model":"XB6534S","value":327},{"dateTime":1403049600,"model":"XB6534S","value":1060.7},{"dateTime":1403049600,"model":"XB6534S","value":4707.5},{"dateTime":1403049600,"model":"XB6534S","value":356.16},{"dateTime":1403049600,"model":"XB6534S","value":1542},{"dateTime":1403136000,"model":"XB6534S","value":2783.4},{"dateTime":1403136000,"model":"XB6534S","value":2924.68},{"dateTime":1403136000,"model":"XB6534S","value":1359},{"dateTime":1403136000,"model":"XB6534S","value":4659.39},{"dateTime":1403222400,"model":"XB6534S","value":896.76},{"dateTime":1403222400,"model":"XB6534S","value":828},{"dateTime":1403222400,"model":"XB6534S","value":3960},{"dateTime":1403222400,"model":"XB6534S","value":1714.2},{"dateTime":1403222400,"model":"XB6534S","value":484.5},{"dateTime":1403222400,"model":"XB6534S","value":2592},{"dateTime":1403222400,"model":"XB6534S","value":9763.2},{"dateTime":1403222400,"model":"XB6534S","value":1932},{"dateTime":1403481600,"model":"XB6534S","value":2955.18},{"dateTime":1403481600,"model":"XB6534S","value":295.38},{"dateTime":1403481600,"model":"XB6534S","value":835.2},{"dateTime":1403481600,"model":"XB6534S","value":825.6},{"dateTime":1403481600,"model":"XB6534S","value":940.1},{"dateTime":1403481600,"model":"XB6534S","value":3357.96},{"dateTime":1403481600,"model":"XB6534S","value":1402.8},{"dateTime":1403481600,"model":"XB6534S","value":1120},{"dateTime":1403481600,"model":"XB6534S","value":24.12},{"dateTime":1403568000,"model":"XB6534S","value":942},{"dateTime":1403568000,"model":"XB6534S","value":3020.1},{"dateTime":1403568000,"model":"XB6534S","value":3008},{"dateTime":1403568000,"model":"XB6534S","value":756},{"dateTime":1403568000,"model":"XB6534S","value":714},{"dateTime":1403568000,"model":"XB6534S","value":3297.84},{"dateTime":1403568000,"model":"XB6534S","value":640.84},{"dateTime":1403568000,"model":"XB6534S","value":100.8},{"dateTime":1403568000,"model":"XB6534S","value":1167},{"dateTime":1403568000,"model":"XB6534S","value":2688},{"dateTime":1403654400,"model":"XB6534S","value":3921.6},{"dateTime":1403654400,"model":"XB6534S","value":393.75},{"dateTime":1403654400,"model":"XB6534S","value":1190},{"dateTime":1403654400,"model":"XB6534S","value":2187.6},{"dateTime":1403740800,"model":"XB6534S","value":3281.4},{"dateTime":1403740800,"model":"XB6534S","value":606},{"dateTime":1403740800,"model":"XB6534S","value":1213.86},{"dateTime":1403827200,"model":"XB6534S","value":1354.44},{"dateTime":1403827200,"model":"XB6534S","value":1640.7},{"dateTime":1404086400,"model":"XB6534S","value":380.52},{"dateTime":1404086400,"model":"XB6534S","value":1608.66},{"dateTime":1404086400,"model":"XB6534S","value":1104},{"dateTime":1404172800,"model":"XB6534S","value":4518},{"dateTime":1404172800,"model":"XB6534S","value":582},{"dateTime":1404172800,"model":"XB6534S","value":680.4},{"dateTime":1404172800,"model":"XB6534S","value":68.64},{"dateTime":1404172800,"model":"XB6534S","value":942.84},{"dateTime":1404172800,"model":"XB6534S","value":720},{"dateTime":1404172800,"model":"XB6534S","value":1330.56},{"dateTime":1404172800,"model":"XB6534S","value":4965.3},{"dateTime":1404172800,"model":"XB6534S","value":715.2},{"dateTime":1404172800,"model":"XB6534S","value":1394.4},{"dateTime":1404259200,"model":"XB6534S","value":3519.9},{"dateTime":1404259200,"model":"XB6534S","value":2770.96},{"dateTime":1404259200,"model":"XB6534S","value":2036.64},{"dateTime":1404259200,"model":"XB6534S","value":84.96},{"dateTime":1404259200,"model":"XB6534S","value":797.4},{"dateTime":1404259200,"model":"XB6534S","value":468},{"dateTime":1404345600,"model":"XB6534S","value":1321.2},{"dateTime":1404345600,"model":"XB6534S","value":2675.25},{"dateTime":1404345600,"model":"XB6534S","value":480},{"dateTime":1404345600,"model":"XB6534S","value":238.44},{"dateTime":1404432000,"model":"XB6534S","value":4905},{"dateTime":1404432000,"model":"XB6534S","value":746.4},{"dateTime":1404432000,"model":"XB6534S","value":3237},{"dateTime":1404432000,"model":"XB6534S","value":283.02},{"dateTime":1404432000,"model":"XB6534S","value":1104},{"dateTime":1404432000,"model":"XB6534S","value":1024.8},{"dateTime":1404518400,"model":"XB6534S","value":926.4},{"dateTime":1404691200,"model":"XB6534S","value":4464},{"dateTime":1404691200,"model":"XB6534S","value":10468.08},{"dateTime":1404777600,"model":"XB6534S","value":8250},{"dateTime":1404777600,"model":"XB6534S","value":534},{"dateTime":1404777600,"model":"XB6534S","value":1377.6},{"dateTime":1404864000,"model":"XB6534S","value":4101.75},{"dateTime":1404864000,"model":"XB6534S","value":484.8},{"dateTime":1404864000,"model":"XB6534S","value":6562.8},{"dateTime":1404950400,"model":"XB6534S","value":127.8},{"dateTime":1404950400,"model":"XB6534S","value":1155},{"dateTime":1404950400,"model":"XB6534S","value":3600},{"dateTime":1404950400,"model":"XB6534S","value":23330},{"dateTime":1404950400,"model":"XB6534S","value":1166.5},{"dateTime":1404950400,"model":"XB6534S","value":2207.76},{"dateTime":1405036800,"model":"XB6534S","value":2152.56},{"dateTime":1405036800,"model":"XB6534S","value":2307.6},{"dateTime":1405296000,"model":"XB6534S","value":2310},{"dateTime":1405296000,"model":"XB6534S","value":1836},{"dateTime":1405296000,"model":"XB6534S","value":325.08},{"dateTime":1405296000,"model":"XB6534S","value":888},{"dateTime":1405296000,"model":"XB6534S","value":91.8},{"dateTime":1405296000,"model":"XB6534S","value":4199.4},{"dateTime":1405296000,"model":"XB6534S","value":1275},{"dateTime":1405296000,"model":"XB6534S","value":1171.8},{"dateTime":1405296000,"model":"XB6534S","value":540},{"dateTime":1405382400,"model":"XB6534S","value":937.56},{"dateTime":1405382400,"model":"XB6534S","value":990},{"dateTime":1405382400,"model":"XB6534S","value":1000.56},{"dateTime":1405468800,"model":"XB6534S","value":619.2},{"dateTime":1405468800,"model":"XB6534S","value":1548},{"dateTime":1405468800,"model":"XB6534S","value":11524},{"dateTime":1405555200,"model":"XB6534S","value":770},{"dateTime":1405555200,"model":"XB6534S","value":700},{"dateTime":1405555200,"model":"XB6534S","value":810.72},{"dateTime":1405555200,"model":"XB6534S","value":4375.2},{"dateTime":1405555200,"model":"XB6534S","value":312},{"dateTime":1405641600,"model":"XB6534S","value":3033.3},{"dateTime":1405900800,"model":"XB6534S","value":3281.4},{"dateTime":1405900800,"model":"XB6534S","value":2412},{"dateTime":1405900800,"model":"XB6534S","value":393.75},{"dateTime":1405900800,"model":"XB6534S","value":990},{"dateTime":1405900800,"model":"XB6534S","value":172},{"dateTime":1405987200,"model":"XB6534S","value":2682},{"dateTime":1405987200,"model":"XB6534S","value":3613.36},{"dateTime":1405987200,"model":"XB6534S","value":364.6},{"dateTime":1406073600,"model":"XB6534S","value":3734.02},{"dateTime":1406160000,"model":"XB6534S","value":2008.8},{"dateTime":1406160000,"model":"XB6534S","value":53.76},{"dateTime":1406160000,"model":"XB6534S","value":1166.5},{"dateTime":1406160000,"model":"XB6534S","value":367.2},{"dateTime":1406160000,"model":"XB6534S","value":1891.2},{"dateTime":1406160000,"model":"XB6534S","value":1638},{"dateTime":1406246400,"model":"XB6534S","value":393},{"dateTime":1406246400,"model":"XB6534S","value":1718.4},{"dateTime":1406246400,"model":"XB6534S","value":3359.52},{"dateTime":1406246400,"model":"XB6534S","value":3211.2},{"dateTime":1406678400,"model":"XB6534S","value":1496.9},{"dateTime":1406678400,"model":"XB6534S","value":354.6},{"dateTime":1406678400,"model":"XB6534S","value":514.8},{"dateTime":1406678400,"model":"XB6534S","value":276},{"dateTime":1406678400,"model":"XB6534S","value":1181.25},{"dateTime":1406678400,"model":"XB6534S","value":209.98},{"dateTime":1406678400,"model":"XB6534S","value":3253.62},{"dateTime":1406764800,"model":"XB6534S","value":3483.68},{"dateTime":1406764800,"model":"XB6534S","value":121.44},{"dateTime":1406764800,"model":"XB6534S","value":220},{"dateTime":1406851200,"model":"XB6534S","value":2964},{"dateTime":1406851200,"model":"XB6534S","value":1388.1},{"dateTime":1406851200,"model":"XB6534S","value":553.56},{"dateTime":1406851200,"model":"XB6534S","value":321},{"dateTime":1406851200,"model":"XB6534S","value":800.51},{"dateTime":1406851200,"model":"XB6534S","value":984},{"dateTime":1406851200,"model":"XB6534S","value":1752},{"dateTime":1406851200,"model":"XB6534S","value":97.56},{"dateTime":1407110400,"model":"XB6534S","value":666},{"dateTime":1407110400,"model":"XB6534S","value":1134},{"dateTime":1407110400,"model":"XB6534S","value":1458.4},{"dateTime":1407110400,"model":"XB6534S","value":403.44},{"dateTime":1407110400,"model":"XB6534S","value":276},{"dateTime":1407196800,"model":"XB6534S","value":437.04},{"dateTime":1407196800,"model":"XB6534S","value":2391},{"dateTime":1407196800,"model":"XB6534S","value":153},{"dateTime":1407283200,"model":"XB6534S","value":6562.8},{"dateTime":1407283200,"model":"XB6534S","value":320.28},{"dateTime":1407283200,"model":"XB6534S","value":144.6},{"dateTime":1407283200,"model":"XB6534S","value":685.8},{"dateTime":1407283200,"model":"XB6534S","value":1339.2},{"dateTime":1407369600,"model":"XB6534S","value":1518},{"dateTime":1407369600,"model":"XB6534S","value":277.2},{"dateTime":1407369600,"model":"XB6534S","value":339},{"dateTime":1407369600,"model":"XB6534S","value":1399.8},{"dateTime":1407369600,"model":"XB6534S","value":2102.3},{"dateTime":1407369600,"model":"XB6534S","value":424.26},{"dateTime":1407369600,"model":"XB6534S","value":1823},{"dateTime":1407369600,"model":"XB6534S","value":2654.2},{"dateTime":1407369600,"model":"XB6534S","value":106.32},{"dateTime":1407369600,"model":"XB6534S","value":1188},{"dateTime":1407456000,"model":"XB6534S","value":540},{"dateTime":1407456000,"model":"XB6534S","value":3213.6},{"dateTime":1407715200,"model":"XB6534S","value":10793.16},{"dateTime":1407715200,"model":"XB6534S","value":3284.24},{"dateTime":1407715200,"model":"XB6534S","value":1064.4},{"dateTime":1407801600,"model":"XB6534S","value":1695.6},{"dateTime":1407801600,"model":"XB6534S","value":594},{"dateTime":1407801600,"model":"XB6534S","value":808.8},{"dateTime":1407801600,"model":"XB6534S","value":2634.24},{"dateTime":1407801600,"model":"XB6534S","value":1020},{"dateTime":1407801600,"model":"XB6534S","value":1458.4},{"dateTime":1407801600,"model":"XB6534S","value":729.2},{"dateTime":1407888000,"model":"XB6534S","value":244.8},{"dateTime":1407888000,"model":"XB6534S","value":211.68},{"dateTime":1407888000,"model":"XB6534S","value":414},{"dateTime":1407974400,"model":"XB6534S","value":7092.6},{"dateTime":1407974400,"model":"XB6534S","value":840.54},{"dateTime":1407974400,"model":"XB6534S","value":1691.72},{"dateTime":1407974400,"model":"XB6534S","value":983.88},{"dateTime":1407974400,"model":"XB6534S","value":4056},{"dateTime":1408060800,"model":"XB6534S","value":1740},{"dateTime":1408060800,"model":"XB6534S","value":249.36},{"dateTime":1408060800,"model":"XB6534S","value":1625.4},{"dateTime":1408060800,"model":"XB6534S","value":5813.2},{"dateTime":1408060800,"model":"XB6534S","value":3813},{"dateTime":1408060800,"model":"XB6534S","value":542.04},{"dateTime":1408060800,"model":"XB6534S","value":79.56},{"dateTime":1408060800,"model":"XB6534S","value":1512.12},{"dateTime":1408147200,"model":"XB6534S","value":3348},{"dateTime":1408147200,"model":"XB6534S","value":1792.8},{"dateTime":1408320000,"model":"XB6534S","value":466.6},{"dateTime":1408320000,"model":"XB6534S","value":424.8},{"dateTime":1408320000,"model":"XB6534S","value":550.8},{"dateTime":1408320000,"model":"XB6534S","value":440.64},{"dateTime":1408320000,"model":"XB6534S","value":29.22},{"dateTime":1408320000,"model":"XB6534S","value":15.99},{"dateTime":1408320000,"model":"XB6534S","value":602.4},{"dateTime":1408320000,"model":"XB6534S","value":669.6},{"dateTime":1408406400,"model":"XB6534S","value":19.6},{"dateTime":1408406400,"model":"XB6534S","value":3168},{"dateTime":1408406400,"model":"XB6534S","value":1785},{"dateTime":1408406400,"model":"XB6534S","value":700},{"dateTime":1408406400,"model":"XB6534S","value":1605.6},{"dateTime":1408406400,"model":"XB6534S","value":3734.02},{"dateTime":1408492800,"model":"XB6534S","value":3035.78},{"dateTime":1408492800,"model":"XB6534S","value":2262.2},{"dateTime":1408492800,"model":"XB6534S","value":1823},{"dateTime":1408579200,"model":"XB6534S","value":3424.8},{"dateTime":1408579200,"model":"XB6534S","value":1188},{"dateTime":1408579200,"model":"XB6534S","value":520.44},{"dateTime":1408579200,"model":"XB6534S","value":487.08},{"dateTime":1408579200,"model":"XB6534S","value":6670.8},{"dateTime":1408665600,"model":"XB6534S","value":446},{"dateTime":1408924800,"model":"XB6534S","value":1566},{"dateTime":1408924800,"model":"XB6534S","value":917.28},{"dateTime":1408924800,"model":"XB6534S","value":18611.44},{"dateTime":1408924800,"model":"XB6534S","value":1576.92},{"dateTime":1409011200,"model":"XB6534S","value":874.2},{"dateTime":1409011200,"model":"XB6534S","value":1053},{"dateTime":1409011200,"model":"XB6534S","value":56.4},{"dateTime":1409011200,"model":"XB6534S","value":110.16},{"dateTime":1409011200,"model":"XB6534S","value":282.6},{"dateTime":1409011200,"model":"XB6534S","value":597.48},{"dateTime":1409011200,"model":"XB6534S","value":426.04},{"dateTime":1409097600,"model":"XB6534S","value":6006.72},{"dateTime":1409097600,"model":"XB6534S","value":253.26},{"dateTime":1409097600,"model":"XB6534S","value":2315.94},{"dateTime":1409184000,"model":"XB6534S","value":1067.04},{"dateTime":1409184000,"model":"XB6534S","value":9177.72},{"dateTime":1409184000,"model":"XB6534S","value":6015.9},{"dateTime":1409184000,"model":"XB6534S","value":1843.3},{"dateTime":1409184000,"model":"XB6534S","value":3587.7},{"dateTime":1409270400,"model":"XB6534S","value":1265.4},{"dateTime":1409270400,"model":"XB6534S","value":2625.12},{"dateTime":1409270400,"model":"XB6534S","value":1530},{"dateTime":1409529600,"model":"XB6534S","value":1071.14},{"dateTime":1409529600,"model":"XB6534S","value":81.9},{"dateTime":1409529600,"model":"XB6534S","value":8402.4},{"dateTime":1409529600,"model":"XB6534S","value":390.6},{"dateTime":1409529600,"model":"XB6534S","value":360},{"dateTime":1409616000,"model":"XB6534S","value":765.4},{"dateTime":1409616000,"model":"XB6534S","value":1224},{"dateTime":1409616000,"model":"XB6534S","value":1056},{"dateTime":1409616000,"model":"XB6534S","value":7583.68},{"dateTime":1409702400,"model":"XB6534S","value":3561.96},{"dateTime":1409702400,"model":"XB6534S","value":294.6},{"dateTime":1409702400,"model":"XB6534S","value":3084},{"dateTime":1409702400,"model":"XB6534S","value":4208.79},{"dateTime":1409702400,"model":"XB6534S","value":1458.4},{"dateTime":1409788800,"model":"XB6534S","value":2487.34},{"dateTime":1409788800,"model":"XB6534S","value":220.8},{"dateTime":1409875200,"model":"XB6534S","value":1225.08},{"dateTime":1409875200,"model":"XB6534S","value":4684.38},{"dateTime":1409875200,"model":"XB6534S","value":2223.9},{"dateTime":1409875200,"model":"XB6534S","value":651.12},{"dateTime":1409875200,"model":"XB6534S","value":462.6},{"dateTime":1409875200,"model":"XB6534S","value":218.76},{"dateTime":1409875200,"model":"XB6534S","value":797.76},{"dateTime":1410134400,"model":"XB6534S","value":4026.6},{"dateTime":1410220800,"model":"XB6534S","value":688.8},{"dateTime":1410220800,"model":"XB6534S","value":165.6},{"dateTime":1410220800,"model":"XB6534S","value":4512},{"dateTime":1410307200,"model":"XB6534S","value":93.32},{"dateTime":1410307200,"model":"XB6534S","value":5784},{"dateTime":1410307200,"model":"XB6534S","value":4481.28},{"dateTime":1410393600,"model":"XB6534S","value":806.4},{"dateTime":1410480000,"model":"XB6534S","value":2100.48},{"dateTime":1410480000,"model":"XB6534S","value":0},{"dateTime":1410480000,"model":"XB6534S","value":1493.12},{"dateTime":1410739200,"model":"XB6534S","value":2760},{"dateTime":1410739200,"model":"XB6534S","value":2916.8},{"dateTime":1410739200,"model":"XB6534S","value":606},{"dateTime":1410739200,"model":"XB6534S","value":4284.24},{"dateTime":1410739200,"model":"XB6534S","value":4368},{"dateTime":1410825600,"model":"XB6534S","value":4906.8},{"dateTime":1410825600,"model":"XB6534S","value":2187.6},{"dateTime":1410825600,"model":"XB6534S","value":1900.98},{"dateTime":1410825600,"model":"XB6534S","value":350.93},{"dateTime":1410825600,"model":"XB6534S","value":5090.4},{"dateTime":1410825600,"model":"XB6534S","value":819.96},{"dateTime":1410825600,"model":"XB6534S","value":612.72},{"dateTime":1410912000,"model":"XB6534S","value":1093.44},{"dateTime":1410912000,"model":"XB6534S","value":1312.56},{"dateTime":1410998400,"model":"XB6534S","value":204},{"dateTime":1410998400,"model":"XB6534S","value":640.8},{"dateTime":1410998400,"model":"XB6534S","value":1212},{"dateTime":1410998400,"model":"XB6534S","value":825.54},{"dateTime":1410998400,"model":"XB6534S","value":80.98},{"dateTime":1410998400,"model":"XB6534S","value":633.96},{"dateTime":1410998400,"model":"XB6534S","value":6624},{"dateTime":1411084800,"model":"XB6534S","value":206.4},{"dateTime":1411084800,"model":"XB6534S","value":91.92},{"dateTime":1411084800,"model":"XB6534S","value":272.28},{"dateTime":1411084800,"model":"XB6534S","value":765},{"dateTime":1411344000,"model":"XB6534S","value":3372},{"dateTime":1411344000,"model":"XB6534S","value":2099.7},{"dateTime":1411344000,"model":"XB6534S","value":840},{"dateTime":1411344000,"model":"XB6534S","value":792},{"dateTime":1411430400,"model":"XB6534S","value":11198.4},{"dateTime":1411430400,"model":"XB6534S","value":1569.3},{"dateTime":1411430400,"model":"XB6534S","value":1846.32},{"dateTime":1411430400,"model":"XB6534S","value":3131.26},{"dateTime":1411430400,"model":"XB6534S","value":546.9},{"dateTime":1411516800,"model":"XB6534S","value":869.88},{"dateTime":1411516800,"model":"XB6534S","value":508.68},{"dateTime":1411516800,"model":"XB6534S","value":3060},{"dateTime":1411516800,"model":"XB6534S","value":405.6},{"dateTime":1411603200,"model":"XB6534S","value":216},{"dateTime":1411603200,"model":"XB6534S","value":2947.83},{"dateTime":1411603200,"model":"XB6534S","value":276},{"dateTime":1411603200,"model":"XB6534S","value":3299.4},{"dateTime":1411603200,"model":"XB6534S","value":1106.76},{"dateTime":1411689600,"model":"XB6534S","value":1297.8},{"dateTime":1411689600,"model":"XB6534S","value":128.4},{"dateTime":1411689600,"model":"XB6534S","value":444},{"dateTime":1411689600,"model":"XB6534S","value":1316.7},{"dateTime":1411689600,"model":"XB6534S","value":1014},{"dateTime":1411689600,"model":"XB6534S","value":480},{"dateTime":1411689600,"model":"XB6534S","value":213},{"dateTime":1411948800,"model":"XB6534S","value":1233},{"dateTime":1411948800,"model":"XB6534S","value":271.2},{"dateTime":1412121600,"model":"XB6534S","value":1148.4}];
+*/
+ var groupData=[];
+  var nest=d3.nest().key(function(d) {return d.model;}).key(function(d) {return d.dateTime;})
+  .rollup(function(d){
+   var values=d3.sum(d, function(g) {return g.value; });
+  groupData.push({"dateTime":d[0].dateTime,"model":d[0].model,"value":values});
+  });
+  nest.entries(processedData);
+  processedData=groupData;
+  
+  //check for majority periodType
+
+  periodTypeMaj="quarter";
+  console.log("periodTypeMaj",JSON.stringify(periodTypeMaj));
+  //-end check****
+  //get the correct calander range for each period Type
+  function getRangeNumber(data,domain) {
+  var min=new Date(_.min(_.pluck(data,'dateTime'))*1000);
+  var max=new Date(_.max(_.pluck(data,'dateTime'))*1000);
+  console.log("min:",min.getFullYear());
+  function monthDiff(d1, d2) {
+    var months,years;
+	years = (d2.getFullYear() - d1.getFullYear());
+    months =d2.getMonth()-d1.getMonth()+1;
+    months = months+12*years;
+    return months ;
+	} 
+  function yearDiff(d1,d2) {
+  var years;
+  years=(d2.getFullYear() - d1.getFullYear())+1;
+  return years;
+  }
+  
+   if (domain=='month') return monthDiff(min,max);
+  if (domain=='year') return yearDiff(min,max);
+  }
+ function getStart(data){
+  var min=new Date(_.min(_.pluck(data,'dateTime'))*1000);
+  return min;
+  }
+   //**sub-domain mapping
+  getQuarterNumber_Q = function(d) {
+        timeFormat=d3.time.format("%b"); 	
+		if(typeof d=="object"){
+			monthStr=timeFormat(d);
+  return "Q"+Math.floor((d.getMonth() + 3)/3)+": "+monthStr;}
+  else if (typeof d=="number") { var datt=new Date(d);
+  	monthStr=timeFormat(datt);
+  return "Q"+Math.floor((datt.getMonth() + 3)/3)+": "+monthStr;
+  }
+      };
+   mapping=[
+  //{domain:"month",subDomain:"day",domainLabel:"%b",subDomainLabel:"%d",rowLimit:31,cellPadding:2},
+  {periodTypeMaj:"year",domain:"year",subDomain:"month",domainLabel:"%Y",subDomainLabel:"%b",
+  rowLimit:12,cellPad_x:26,cellPad_y:10,cellWidth:25,cellSize:35,cellPadding:1,domainMargin:1,
+  range:getRangeNumber(processedData,'year'),
+  start:getStart(processedData),marginY:_.map(_.range(0,12),function(num) {return num*36+35/2;}),
+  marginYLabel:['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec']},
+  {periodTypeMaj:"quarter",domain:"year",subDomain:"x_month",domainLabel: "%Y" ,subDomainLabel:"%b",rowLimit:3,
+  cellPad_x:35,cellPad_y:10,cellWidth:32,cellSize:39,cellPadding:1,domainMargin:5,range:getRangeNumber(processedData,'year'),
+  start:getStart(processedData),marginY:_.map(_.range(0,4),function(num) {return num*40+39/2;}), marginYLabel:['Q1','Q2','Q3','Q4']},
+  {periodTypeMaj:"month",domain:"month",subDomain:"day",domainLabel: "%b" ,subDomainLabel:"%e",rowLimit:31,
+  cellPad_x:26,cellPad_y:26,cellWidth:25,cellSize:15,cellPadding:1,domainMargin:5,range:getRangeNumber(processedData,'month'),
+  start:getStart(processedData),marginY:_.map(_.range(0,31),function(num) {return num*16+26/2;}), marginYLabel:_.range(1,32)}];
+  
+  var pTypeConfig={subDomainMaj:"",domainLabelMaj:"",subDomainLabelMaj:"",rowLimitMaj:"",cellPaddingMaj:"",cellWidthMaj:"",
+  domainMaj:"",cellSizeMaj:"",cellPaddingMaj:"",domainMarginMaj:"",rangeMaj:"",start:"",marginY:"",marginYLabel:""};
+  
+  mapping.forEach(function(d,i) { if (d.periodTypeMaj==periodTypeMaj) {
+  pTypeConfig.start=d.start;
+  pTypeConfig.domainMaj=d.domain;pTypeConfig.subDomainMaj=d.subDomain; 
+  pTypeConfig.domainLabelMaj=d.domainLabel; pTypeConfig.subDomainLabelMaj=d.subDomainLabel; pTypeConfig.rowLimitMaj=d.rowLimit;
+  pTypeConfig.cellWidthMaj=d.cellWidth;
+  pTypeConfig.cellSizeMaj=d.cellSize;pTypeConfig.cellPaddingMaj=d.cellPadding;
+  pTypeConfig.domainMarginMaj=d.domainMargin;pTypeConfig.rangeMaj=d.range;
+  pTypeConfig.marginY=d.marginY;pTypeConfig.marginYLabel=d.marginYLabel;
+  }})
+    rawdata=processedData;
+    
+  console.log("rawdata_new",JSON.stringify(rawdata));
+     var smp = _.groupBy(rawdata, function(d){ 
+   return d["model"]; 
+   });
+  var toDataArray=[];
+ _.each(smp,function(t,unit) {
+  var toDataObj1={};
+  var toDataObj={value:toDataObj1,model:unit};
+  t.forEach(function(d) {
+    var dateProperty=d.dateTime;
+      toDataObj1[dateProperty]=d.value;
+      });  
+  toDataArray.push(toDataObj);
+  });
+  console.log("toDataArray",JSON.stringify(toDataArray));
+
+//--end data
+
+
+createTableCell(toDataArray,table1);
+//Append to Y margin
+//d3.select("#table1").selectAll(".yMarginSVG").append("text").text("hello").attr("y",20);
+//data(pTypeConfig.marginYLabel).enter().
+_.each(pTypeConfig.marginYLabel,function(d,i) { 
+d3.select("#table1").selectAll(".yMarginSVG").append("text")
+.text(d).attr("y",pTypeConfig.marginY[i]).attr("class","margin-text");
+});
+d3.selectAll(".yMarginSVG").attr("height",_.last(pTypeConfig.marginY)+35/2);
+//Initial Property using first drawchart
+var sliderWidth=300;	
+var legendScaleLength=4;
+var indexArr=_.range(legendScaleLength);
+	var firstHandle, secondHandle,thirdHandle;
+var prefix="";
+var suffix="millions";
+	//first draw
+	valueArray=[];
+	 var firstDraw=drawChart(toDataArray,pTypeConfig,[],valueArray,[],false);
+	 console.log("v3",valueArray);
+	 valueArray=_.compact(valueArray); //remove nulls
+	 console.log("valueArray ,.",valueArray);
+	 var minMaxArr=[_.min(valueArray),_.max(valueArray)];
+	 console.log("new minMaxArr",minMaxArr);
+
+//Initialize ScaleArr
+var scaleArrInit=_.map(indexArr,function(num) {return parseInt(((minMaxArr[1]-minMaxArr[0])/(legendScaleLength))*num +minMaxArr[0]);}); //inital scale
+var scaleArr=scaleArrInit;
+
+//Second draw
+ var legendColors={
+    min:"#e8ffd1",
+		max:"#ff8000",
+		//empty:'#efefef'
+		empty:'white'
+    ,  base: "black"
+  };
+var calCollection= drawChart(toDataArray,pTypeConfig,scaleArr,valueArray,legendColors,true);
+ //build Color for slider handler similar to legends
+  legendScale=buildColor(legendColors,scaleArr);
+
+ //Add slider tick
+ //ticks
+var tickGroup=d3.select("#sliderTicks").append("svg").attr("y",14).style("height",30).style("width",700);
+ var tickScale=d3.scale.linear().domain(minMaxArr).range([30, sliderWidth+30]);  //tick Scale
+
+  var tickFormat = tickScale.ticks(10); // Compute the tick format.
+  	        // Initialize the ticks with the old scale, x0.
+     tickGroup.selectAll(".sliderTick").data(tickFormat).enter()
+		.append("svg:line")
+		.attr("x1",tickScale)
+		.attr("x2",tickScale)
+           .attr("y1", 0)
+          .attr("y2", 12)
+		  .attr("stroke","black")
+		  .attr("class","sliderTick");
+
+      tickGroup.selectAll("text.xAxisBottom").data(tickFormat).enter().append("svg:text")
+	  .attr("x",tickScale).attr("y",10)
+	  .attr("text-anchor", "middle")
+          .attr("dy", "1em")
+          .text(function(d,i) { return tickFormat[i]; }).attr("class", "xAxisBottom");
+//Add prefix
+tickGroup.append("svg:text").attr("x",4).attr("y",10).attr("text-anchor", "left")
+          .attr("dy", "1em").text(prefix);
+		  
+//Add suffix
+tickGroup.append("svg:text").attr("x",330).attr("y",10).attr("text-anchor", "left")
+          .attr("dy", "1em").text(suffix);
+//Initialize Slider
+$("#slider").slider({
+	max:minMaxArr[1],
+	min:minMaxArr[0],
+    values: scaleArr,
+    slide: function(event, ui){
+         var handleElem = $(ui.handle).get(0);
+         if( handleElem == firstHandle.get(0)) {
+             return false; //false cancel slide
+         }
+		  //Actual Handle Selected
+        var handleIndex = $(ui.handle).index();
+        var diffA, diffB;
+
+        //Check with right handles
+        if(handleIndex > 0)
+            diffA = ui.values[handleIndex] - ui.values[handleIndex-1];
+	        //Check with left handles
+        if(handleIndex < ui.values.length-1)
+            diffB = ui.values[handleIndex+1] - ui.values[handleIndex];
+
+        if (diffA <= 0 || diffB <= 0) { /*checks for the values and compares*/
+            return false;}
+		}
+});
+d3.select(".ui-slider-horizontal").style("width",sliderWidth);
+firstHandle = $("#slider").find(".ui-slider-handle:first");
+secondHandle = firstHandle.next();
+_.each(legendScale,function(d,i) {
+$('#slider').find('a:nth-child('+(i+1)+')').addClass('ui-slider-handle'+(i+1));
+$('#slider.ui-slider .ui-slider-handle.ui-slider-handle'+(i+1)).css('background',d);
+$('#slider.ui-slider .ui-slider-handle.ui-slider-handle'+(i+1)).autocomplete('widget').removeClass('ui-corner-all');
+});
+
+	d3.select("#update").on("click",function(){
+	// read a change in the slider input
+	var scaleArr = $( "#slider" ).slider( "option", "values" );
+	console.log("scaleArr : ",scaleArr);
+	//update the chart with the new slider Values
+	updateChart(calCollection,scaleArr,valueArray);
+		});
+
+function updateChart(calCollection,scaleArr,valueArray){
+_.each(calCollection,function(d,i){
+d.setLegend(scaleArr);
+});
+}
+
+function drawChart(toDataArray,pTypeConfig,scaleArr,valueArray,legendColors,drawBool){
+  console.log("domainMaj: ",pTypeConfig.domainMaj,"domainLabelMaj: ",pTypeConfig.domainLabelMaj,
+  " subDomainMaj: ",pTypeConfig.subDomainMaj," subDomainLabelMaj: ",pTypeConfig.subDomainLabelMaj);
+
+ var calCollection=[];
+ toDataArray.forEach(function(d,i) {
+  	var cal = new CalHeatMap(valueArray);
+var varSelector=(drawBool===true) ? ("#cal-heatmap"+i):"#hidden";
+	cal.init({ 
+	  	itemSelector: varSelector,
+   data: toDataArray[i].value,
+        start: pTypeConfig.start,
+        domain: pTypeConfig.domainMaj,
+		domainLabelFormat: pTypeConfig.domainLabelMaj,
+		domainGutter: 1,
+		domainMargin:pTypeConfig.domainMarginMaj,
+        subDomain: pTypeConfig.subDomainMaj,subDomainTextFormat: pTypeConfig.subDomainLabelMaj,subDomainTitleFormat: {
+		empty: "0 item on {date}"
+	},
+        range: pTypeConfig.rangeMaj,
+  rowLimit:pTypeConfig.rowLimitMaj,
+        legend: scaleArr,
+  legendColors:legendColors,legendCellSize: 15,
+		cellSize:pTypeConfig.cellSizeMaj,
+		cellPadding:pTypeConfig.cellPaddingMaj,
+        cellLabel : {
+			empty: "No data on {date}",
+			filled: "{count} {name} {connector} {date}"
+    },onComplete: function() {console.log("completed");}
+  }  );
+  calCollection.push(cal);
+  }); 
+return calCollection;
+}
+//legendbuildcolor
+function buildColor(legendColors,scaleArr){
+var scaleArr=_.union([0],scaleArr);
+ console.log("scaleArr:: ",scaleArr);
+  var _legend=scaleArr.slice(0);
+  console.log("_legend. .",_legend);
+  var _colorRange=[legendColors.min,legendColors.max];
+var colorScale = d3.scale.linear()
+		.range(_colorRange)
+		.interpolate(d3.interpolateHcl)
+		.domain([d3.min(_legend), d3.max(_legend)]);
+
+	var legendColors = _legend.map(function(element) { return colorScale(element); });
+	legendColors=_.last(legendColors,4);
+			console.log("legendColors",legendColors);
+	return legendColors;
+
+}
+function createTableCell(toDataArray,element){
+_.each(toDataArray,function(d,i){
+ var appendMargin=d3.select(element).append("td").attr("width",130).style("text-align","middle").text("-");	
+  var appendCalHeatmap=d3.select(element).append("td").append("b").text(d['model'])
+  .append("div").attr("id",'cal-heatmap'+i);
+ //append svg to (-) margin
+ appendMargin.append("div").style("position","relative").append("svg").attr("class","yMarginSVG").attr("width",40);
+  });
+}
+
+
+</script>
+</html>
