@@ -148,13 +148,23 @@ _.each(rawdata, function (d) {
   }
    //**sub-domain mapping
   getQuarterNumber_Q = function(d) {
-        timeFormat=d3.time.format("%b"); 	
+       var timeFormat=d3.time.format("%b"); 	
 		if(typeof d=="object"){
 			monthStr=timeFormat(d);
   return "Q"+Math.floor((d.getMonth() + 3)/3)+": "+monthStr;}
   else if (typeof d=="number") { var datt=new Date(d);
   	monthStr=timeFormat(datt);
   return "Q"+Math.floor((datt.getMonth() + 3)/3)+": "+monthStr;
+  }
+      };
+	    getQuarterNumber_Year = function(d) {
+        var timeFormat=d3.time.format("%Y"); 	
+		if(typeof d=="object"){
+			yearStr=timeFormat(d);
+  return "Q"+Math.floor((d.getMonth() + 3)/3)+": "+yearStr;}
+  else if (typeof d=="number") { var datt=new Date(d);
+  	yearStr=timeFormat(datt);
+  return "Q"+Math.floor((datt.getMonth() + 3)/3)+": "+yearStr;
   }
       };
    mapping=[
@@ -228,7 +238,65 @@ var suffix="millions";
 	 console.log("valueArray ,.",valueArray);
 	 var minMaxArr=[_.min(valueArray),_.max(valueArray)];
 	 console.log("new minMaxArr",minMaxArr);
-
+	console.log("toDataArray",JSON.stringify(toDataArray));
+	console.log("oooPeriodTypeMaj",periodTypeMaj);
+	console.log("computedMinMaxARr",computeMinMaxArr(toDataArray,periodTypeMaj));
+	function computeMinMaxArr(toDataArray,periodTypeMaj){
+		//toDataArray is in the form of {value:{"1349395200":40,"1338940800":24},model:vehicle}
+	//domainMaj can year,month
+		var dateValueArr=[];
+		_.each(toDataArray,function(d){
+		for (var propertyName in d.value) {
+		var obj={'date':new Date(parseInt(propertyName)*1000),'value': d.value[propertyName] ,'model':d.model};
+		dateValueArr.push(obj);
+		}
+		});
+		console.log("dateValueArr:",JSON.stringify(dateValueArr));
+	var mappingMinMax={'year':function(dateValueArr) {
+		//subdomain is month
+		var valueArray=[];
+		var nest = d3.nest().key(function(d) {
+		return d.model;
+		}).key(function(d) {return (d.date).getMonth()+'_'+(d.date).getYear();})
+					.rollup(function(d) {
+					var aggValue=d3.sum(d,function(g) {return +g.value;});
+					valueArray.push(aggValue);
+					}).entries(dateValueArr);
+			 var minMaxArr=[_.min(valueArray),_.max(valueArray)];
+			 return minMaxArr;
+		},'month':function(dateValueArr,minMaxArr) {
+		//subdomain is day
+		var valueArray=[];
+		var nest = d3.nest().key(function(d) {
+		return d.model;
+		}).key(function(d) {return 
+		(d.date).getDay()+'_'+(d.date).getMonth()+'_'+(d.date).getYear();})
+					.rollup(function(d) {
+					var aggValue=d3.sum(d,function(g) {return +g.value;});
+					valueArray.push(aggValue);
+					}).entries(dateValueArr);
+			 var minMaxArr=[_.min(valueArray),_.max(valueArray)];
+			 return minMaxArr;
+		},'quarter':function(dateValueArr,minMaxArr){
+		//subdomain is months
+		
+		var valueArray=[];
+		var nest = d3.nest().key(function(d) {
+		return d.model;
+		}).key(function(d) {
+		console.log("getQuarterNumber_Year",getQuarterNumber_Year(d.date));
+		return getQuarterNumber_Year(d.date);})
+					.rollup(function(d) {
+					var aggValue=d3.sum(d,function(g) {return +g.value;});
+					valueArray.push(aggValue);
+					}).entries(dateValueArr);
+			 var minMaxArr=[_.min(valueArray),_.max(valueArray)];
+			 return minMaxArr;
+		}
+			};
+			return mappingMinMax[periodTypeMaj](dateValueArr);
+			
+	}
 //Initialize ScaleArr
 var scaleArrInit=_.map(indexArr,function(num) {return parseInt(((minMaxArr[1]-minMaxArr[0])/(legendScaleLength))*num +minMaxArr[0]);}); //inital scale
 var scaleArr=scaleArrInit;
